@@ -289,3 +289,25 @@ let newProject = new ITProject()
 console.log(newProject)
 newProject.changeName("Super IT Project")
 console.log(newProject)
+
+/* ---------------------------------------------------------------------------
+| NAMESPACES
+--------------------------------------------------------------------------- */
+
+/// <reference path="circleMath.ts"/>
+/// <reference path="rectangleMath.ts"/>
+
+import CircleMath = MyMath.Circle
+
+console.log(MyMath.calculateRectangle(10,20));
+console.log(MyMath.Circle.calculateCirumcumference(10));
+console.log(CircleMath.calculateCirumcumference(10));
+
+/* ---------------------------------------------------------------------------
+| MODULES
+--------------------------------------------------------------------------- */
+
+// import { PI, calculateCirumcumference } from './math/circle'
+import * as Circle from './math/circle'
+// import { calculateRectangle } from './math/rectangle'
+import calc from './math/rectangle'
