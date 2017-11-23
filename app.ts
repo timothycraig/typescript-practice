@@ -311,3 +311,238 @@ console.log(CircleMath.calculateCirumcumference(10));
 import * as Circle from './math/circle'
 // import { calculateRectangle } from './math/rectangle'
 import calc from './math/rectangle'
+
+/* ---------------------------------------------------------------------------
+| INTERFACES
+--------------------------------------------------------------------------- */
+
+interface NamedPerson {
+    firstName: string;
+    age?: number;
+    [propName: string]: any;
+    greet(lastName: string): void;
+}
+
+function greet(person: NamedPerson) {
+    console.log("Hello, " + person.firstName);
+}
+
+function changeName(person: NamedPerson) {
+    person.firstName = "Anna";
+}
+
+const person: NamedPerson = {
+    firstName: "Max",
+    hobbies: ["Cooking", "Sports"],
+    greet(lastName: string) {
+        console.log("Hi, I am " + this.firstName + " " + lastName);
+    }
+};
+
+// greet({firstName: "Max", age: 27});
+changeName(person);
+greet(person);
+person.greet("Anything");
+
+class Person implements NamedPerson {
+    firstName: string;
+    lastName: string;
+
+    greet(lastName: string) {
+        console.log("Hi, I am " + this.firstName + " " + lastName);
+    };
+}
+
+const myPerson = new Person();
+myPerson.firstName = "Maximilian";
+myPerson.lastName = "Anything";
+greet(myPerson);
+myPerson.greet(myPerson.lastName);
+
+
+// Function Types
+
+
+interface DoubleValueFunc {
+    (number1: number, number2: number): number;
+}
+
+let myDoubleFunction: DoubleValueFunc;
+myDoubleFunction = function (value1: number, value2: number) {
+    return (value1 + value2) * 2;
+};
+
+console.log(myDoubleFunction(10, 20));
+
+
+// Interface Inheritance
+
+interface AgedPerson extends NamedPerson {
+    age: number;
+}
+
+const oldPerson: AgedPerson = {
+    age: 27,
+    firstName: "Max",
+    greet(lastName: string) {
+        console.log("Hello!");
+    }
+};
+
+console.log(oldPerson);
+
+/* ---------------------------------------------------------------------------
+| GENERICS
+--------------------------------------------------------------------------- */
+
+// Simple Generic
+function echo(data: any) {
+    return data;
+}
+
+console.log(echo("Max"));
+console.log(echo(27));
+console.log(echo({ name: "Max", age: 27 }));
+
+// Better Generic
+function betterEcho<T>(data: T) {
+    return data;
+}
+console.log(betterEcho("Max").length);
+console.log(betterEcho<number>(27));
+console.log(betterEcho({ name: "Max", age: 27 }));
+
+// Built-in Generics
+const testResults: Array<number> = [1.94, 2.33];
+testResults.push(-2.99);
+console.log(testResults);
+
+// Arrays
+function printAll<T>(args: T[]) {
+    args.forEach((element) => console.log(element));
+}
+printAll<string>(["Apple", "Banana"]);
+
+// Generic Types
+const echo2: <T>(data: T) => T = betterEcho;
+
+console.log(echo2<string>("Something"));
+
+// Generic Class
+class SimpleMath<T extends number | string, U extends number | string> {
+    baseValue: T;
+    multiplyValue: U;
+    calculate(): number {
+        return +this.baseValue * +this.multiplyValue;
+    }
+}
+
+const simpleMath = new SimpleMath<string, number>();
+simpleMath.baseValue = "10";
+simpleMath.multiplyValue = 20;
+console.log(simpleMath.calculate());
+
+/* ---------------------------------------------------------------------------
+| DECORATORS
+--------------------------------------------------------------------------- */
+
+function logged(constructorFn: Function) {
+    console.log(constructorFn);
+}
+
+@logged
+class Person {
+    constructor() {
+        console.log("Hi!");
+    }
+}
+
+// Factory
+function logging(value: boolean) {
+    return value ? logged : null;
+}
+
+@logging(true)
+class Car {
+
+}
+
+// Advanced
+function printable(constructorFn: Function) {
+    constructorFn.prototype.print = function () {
+        console.log(this);
+    }
+}
+
+@logging(false)
+@printable
+class Plant {
+    name = "Green Plant";
+}
+const plant = new Plant();
+(<any>plant).print();
+
+// Method Decorator
+// Property Decorator
+function editable(value: boolean) {
+    return function (target: any, propName: string, descriptor: PropertyDescriptor) {
+        descriptor.writable = value;
+    }
+}
+
+function overwritable(value: boolean) {
+    return function (target: any, propName: string): any {
+        const newDescriptor: PropertyDescriptor = {
+            writable: value
+        };
+        return newDescriptor;
+    }
+}
+
+class Project {
+    @overwritable(false)
+    projectName: string;
+
+    constructor(name: string) {
+        this.projectName = name;
+    }
+
+    @editable(false)
+    calcBudget() {
+        console.log(1000);
+    }
+}
+
+const project = new Project("Super Project");
+project.calcBudget();
+project.calcBudget = function () {
+    console.log(2000);
+};
+project.calcBudget();
+console.log(project);
+
+// Parameter Decorator
+function printInfo(target: any, methodName: string, paramIndex: number) {
+    console.log("Target: ", target);
+    console.log("methodName: ", methodName);
+    console.log("paramIndex: ", paramIndex);
+}
+
+class Course {
+    name: string;
+
+    constructor(name: string) {
+        this.name = name;
+    }
+
+    printStudentNumbers(mode: string, @printInfo printAll: boolean) {
+        if (printAll) {
+            console.log(10000);
+        } else {
+            console.log(2000);
+        }
+    }
+}
+const course = new Course("Super Course");
+course.printStudentNumbers("anything", true);
+course.printStudentNumbers("anything", false);
